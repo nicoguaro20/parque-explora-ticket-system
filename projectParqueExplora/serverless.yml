@@ -1,0 +1,109 @@
+service: crud-serverless-ticket
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  stage: dev
+  profile: default
+
+  environment:
+    TABLE_NAME: ${self:service}-${sls:stage}-tickets
+    IS_OFFLINE: ${env:IS_OFFLINE, 'false'}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+          Resource: "*"
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+package:
+  individually: true
+  patterns:
+    - "!.dynamodb"
+    - "!node_modules"
+    - "!node_modules/aws-sdk/**"
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8001
+      inMemory: true
+      migrate: true
+      seed: false
+      convertEmptyValues: true
+      noStart: false
+      sharedDb: true
+
+resources:
+  Resources:
+    TicketsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${sls:stage}-tickets
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+        GlobalSecondaryIndexes:
+          - IndexName: sk-index
+            KeySchema:
+              - AttributeName: sk
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+functions:
+
+  get-ticket:
+    handler: getTicket/handler.getTicket
+    events:
+      - httpApi:
+          path: /users/{userId}/tickets
+          method: GET
+
+  create-ticket:
+    handler: createTicket/handler.createTicket
+    events:
+      - httpApi:
+          path: /ticket
+          method: POST
+
+  update-ticket:
+    handler: updateTicket/handler.updateTicket
+    events:
+      - httpApi:
+          path: /ticket/update/{id}
+          method: PATCH
+
+  create-user:
+    handler: createUser/handler.createUser
+    events:
+      - httpApi:
+          path: /user
+          method: POST
+
+  login-user:
+    handler: loginUser/handler.loginUser
+    events:
+      - httpApi:
+          path: /login
+          method: POST

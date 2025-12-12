@@ -1,0 +1,1075 @@
+{
+  "service": {
+    "service": "crud-serverless-ticket",
+    "serviceObject": {
+      "name": "crud-serverless-ticket"
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs18.x",
+      "region": "us-east-2",
+      "stage": "dev",
+      "profile": "default",
+      "environment": {
+        "TABLE_NAME": "crud-serverless-ticket-dev-tickets",
+        "IS_OFFLINE": "false"
+      },
+      "iam": {
+        "role": {
+          "statements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:Query"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      },
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "GetDashticketLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/crud-serverless-ticket-dev-get-ticket"
+            }
+          },
+          "CreateDashticketLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/crud-serverless-ticket-dev-create-ticket"
+            }
+          },
+          "UpdateDashticketLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/crud-serverless-ticket-dev-update-ticket"
+            }
+          },
+          "CreateDashuserLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/crud-serverless-ticket-dev-create-user"
+            }
+          },
+          "LoginDashuserLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/crud-serverless-ticket-dev-login-user"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "crud-serverless-ticket",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/crud-serverless-ticket-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/crud-serverless-ticket-dev*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iam\"][\"role\"][\"statements\"][0]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "crud-serverless-ticket",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "GetDashticketLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+                "S3Key": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z/get-ticket.zip"
+              },
+              "Handler": "getTicket/handler.getTicket",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "crud-serverless-ticket-dev-get-ticket",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "crud-serverless-ticket-dev-tickets",
+                  "IS_OFFLINE": "false"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "GetDashticketLogGroup"
+            ]
+          },
+          "CreateDashticketLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+                "S3Key": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z/create-ticket.zip"
+              },
+              "Handler": "createTicket/handler.createTicket",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "crud-serverless-ticket-dev-create-ticket",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "crud-serverless-ticket-dev-tickets",
+                  "IS_OFFLINE": "false"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CreateDashticketLogGroup"
+            ]
+          },
+          "UpdateDashticketLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+                "S3Key": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z/update-ticket.zip"
+              },
+              "Handler": "updateTicket/handler.updateTicket",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "crud-serverless-ticket-dev-update-ticket",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "crud-serverless-ticket-dev-tickets",
+                  "IS_OFFLINE": "false"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "UpdateDashticketLogGroup"
+            ]
+          },
+          "CreateDashuserLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+                "S3Key": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z/create-user.zip"
+              },
+              "Handler": "createUser/handler.createUser",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "crud-serverless-ticket-dev-create-user",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "crud-serverless-ticket-dev-tickets",
+                  "IS_OFFLINE": "false"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CreateDashuserLogGroup"
+            ]
+          },
+          "LoginDashuserLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+                "S3Key": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z/login-user.zip"
+              },
+              "Handler": "loginUser/handler.loginUser",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "crud-serverless-ticket-dev-login-user",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "TABLE_NAME": "crud-serverless-ticket-dev-tickets",
+                  "IS_OFFLINE": "false"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "LoginDashuserLogGroup"
+            ]
+          },
+          "GetDashticketLambdaVersionC3Slxr20TOOpZBwee4xYT4ZFt92TAUoou1bM7NdPOI": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GetDashticketLambdaFunction"
+              },
+              "CodeSha256": "KVw6OqJ1jAFw3RUXMCN5s0YRu0Hf/ebhQ5OX/LYUh+M="
+            }
+          },
+          "CreateDashticketLambdaVersionOkY0qcCtcKsMEBX6E9nRV1KFW2tdc3taSqi7pi2w": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CreateDashticketLambdaFunction"
+              },
+              "CodeSha256": "KVw6OqJ1jAFw3RUXMCN5s0YRu0Hf/ebhQ5OX/LYUh+M="
+            }
+          },
+          "CreateDashuserLambdaVersionBHCil0Smqn3AvJMzX4SkyrwAhZ1CFN1XDVV7HY8Y": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CreateDashuserLambdaFunction"
+              },
+              "CodeSha256": "KVw6OqJ1jAFw3RUXMCN5s0YRu0Hf/ebhQ5OX/LYUh+M="
+            }
+          },
+          "UpdateDashticketLambdaVersionMDq0NIlTVDkqKXgqVk4HxrT502WBU9rzdpWzaDvho": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "UpdateDashticketLambdaFunction"
+              },
+              "CodeSha256": "KVw6OqJ1jAFw3RUXMCN5s0YRu0Hf/ebhQ5OX/LYUh+M="
+            }
+          },
+          "LoginDashuserLambdaVersionVasI4WANQdDLWI0LWgrzF3ROOWX31IQMiAt5WkiI": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "LoginDashuserLambdaFunction"
+              },
+              "CodeSha256": "KVw6OqJ1jAFw3RUXMCN5s0YRu0Hf/ebhQ5OX/LYUh+M="
+            }
+          },
+          "HttpApi": {
+            "Type": "AWS::ApiGatewayV2::Api",
+            "Properties": {
+              "Name": "dev-crud-serverless-ticket",
+              "ProtocolType": "HTTP"
+            }
+          },
+          "HttpApiStage": {
+            "Type": "AWS::ApiGatewayV2::Stage",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "StageName": "$default",
+              "AutoDeploy": true,
+              "DefaultRouteSettings": {
+                "DetailedMetricsEnabled": false
+              }
+            }
+          },
+          "GetDashticketLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GetDashticketLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationGetDashticket": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"GetDashticketLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetUsersUseridVarTickets": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /users/{userId}/tickets",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationGetDashticket"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationGetDashticket"
+          },
+          "CreateDashticketLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CreateDashticketLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationCreateDashticket": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"CreateDashticketLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostTicket": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /ticket",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationCreateDashticket"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationCreateDashticket"
+          },
+          "UpdateDashticketLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "UpdateDashticketLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationUpdateDashticket": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"UpdateDashticketLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePatchTicketUpdateIdVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "PATCH /ticket/update/{id}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationUpdateDashticket"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationUpdateDashticket"
+          },
+          "CreateDashuserLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "CreateDashuserLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationCreateDashuser": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"CreateDashuserLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostUser": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /user",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationCreateDashuser"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationCreateDashuser"
+          },
+          "LoginDashuserLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "LoginDashuserLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationLoginDashuser": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"LoginDashuserLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRoutePostLogin": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "POST /login",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationLoginDashuser"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationLoginDashuser"
+          },
+          "TicketsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "crud-serverless-ticket-dev-tickets",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "pk",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "sk",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "pk",
+                  "KeyType": "HASH"
+                },
+                {
+                  "AttributeName": "sk",
+                  "KeyType": "RANGE"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST",
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "sk-index",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "sk",
+                      "KeyType": "HASH"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "GetDashticketLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GetDashticketLambdaVersionC3Slxr20TOOpZBwee4xYT4ZFt92TAUoou1bM7NdPOI"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-GetDashticketLambdaFunctionQualifiedArn"
+            }
+          },
+          "CreateDashticketLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CreateDashticketLambdaVersionOkY0qcCtcKsMEBX6E9nRV1KFW2tdc3taSqi7pi2w"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-CreateDashticketLambdaFunctionQualifiedArn"
+            }
+          },
+          "CreateDashuserLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CreateDashuserLambdaVersionBHCil0Smqn3AvJMzX4SkyrwAhZ1CFN1XDVV7HY8Y"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-CreateDashuserLambdaFunctionQualifiedArn"
+            }
+          },
+          "UpdateDashticketLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "UpdateDashticketLambdaVersionMDq0NIlTVDkqKXgqVk4HxrT502WBU9rzdpWzaDvho"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-UpdateDashticketLambdaFunctionQualifiedArn"
+            }
+          },
+          "LoginDashuserLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "LoginDashuserLambdaVersionVasI4WANQdDLWI0LWgrzF3ROOWX31IQMiAt5WkiI"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-LoginDashuserLambdaFunctionQualifiedArn"
+            }
+          },
+          "HttpApiId": {
+            "Description": "Id of the HTTP API",
+            "Value": {
+              "Ref": "HttpApi"
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-HttpApiId"
+            }
+          },
+          "HttpApiUrl": {
+            "Description": "URL of the HTTP API",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  }
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-crud-serverless-ticket-dev-HttpApiUrl"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "dynamodb": {
+        "stages": [
+          "dev"
+        ],
+        "start": {
+          "port": 8001,
+          "inMemory": true,
+          "migrate": true,
+          "seed": false,
+          "convertEmptyValues": true,
+          "noStart": false,
+          "sharedDb": true
+        }
+      }
+    },
+    "plugins": [
+      "serverless-offline",
+      "serverless-dynamodb-local"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "get-ticket": {
+        "handler": "getTicket/handler.getTicket",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/users/{userId}/tickets",
+              "method": "GET"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/users/{userId}/tickets"
+          }
+        ],
+        "name": "crud-serverless-ticket-dev-get-ticket",
+        "package": {
+          "artifact": ".serverless\\get-ticket.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "GetDashticketLambdaVersionC3Slxr20TOOpZBwee4xYT4ZFt92TAUoou1bM7NdPOI"
+      },
+      "create-ticket": {
+        "handler": "createTicket/handler.createTicket",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/ticket",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/ticket"
+          }
+        ],
+        "name": "crud-serverless-ticket-dev-create-ticket",
+        "package": {
+          "artifact": ".serverless\\create-ticket.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "CreateDashticketLambdaVersionOkY0qcCtcKsMEBX6E9nRV1KFW2tdc3taSqi7pi2w"
+      },
+      "update-ticket": {
+        "handler": "updateTicket/handler.updateTicket",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/ticket/update/{id}",
+              "method": "PATCH"
+            },
+            "resolvedMethod": "PATCH",
+            "resolvedPath": "/ticket/update/{id}"
+          }
+        ],
+        "name": "crud-serverless-ticket-dev-update-ticket",
+        "package": {
+          "artifact": ".serverless\\update-ticket.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "UpdateDashticketLambdaVersionMDq0NIlTVDkqKXgqVk4HxrT502WBU9rzdpWzaDvho"
+      },
+      "create-user": {
+        "handler": "createUser/handler.createUser",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/user",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/user"
+          }
+        ],
+        "name": "crud-serverless-ticket-dev-create-user",
+        "package": {
+          "artifact": ".serverless\\create-user.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "CreateDashuserLambdaVersionBHCil0Smqn3AvJMzX4SkyrwAhZ1CFN1XDVV7HY8Y"
+      },
+      "login-user": {
+        "handler": "loginUser/handler.loginUser",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/login",
+              "method": "POST"
+            },
+            "resolvedMethod": "POST",
+            "resolvedPath": "/login"
+          }
+        ],
+        "name": "crud-serverless-ticket-dev-login-user",
+        "package": {
+          "artifact": ".serverless\\login-user.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs18.x",
+        "vpc": {},
+        "versionLogicalId": "LoginDashuserLambdaVersionVasI4WANQdDLWI0LWgrzF3ROOWX31IQMiAt5WkiI"
+      }
+    },
+    "resources": {
+      "Resources": {
+        "TicketsTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "crud-serverless-ticket-dev-tickets",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "pk",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "sk",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "pk",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "sk",
+                "KeyType": "RANGE"
+              }
+            ],
+            "BillingMode": "PAY_PER_REQUEST",
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "sk-index",
+                "KeySchema": [
+                  {
+                    "AttributeName": "sk",
+                    "KeyType": "HASH"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless",
+    "initialServerlessConfig": {
+      "service": "crud-serverless-ticket",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "plugins": {
+        "$ref": "$[\"service\"][\"plugins\"]"
+      },
+      "package": {
+        "individually": true,
+        "patterns": [
+          "!.dynamodb",
+          "!node_modules",
+          "!node_modules/aws-sdk/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/crud-serverless-ticket/dev/code-artifacts",
+        "deploymentBucket": "serverless-framework-deployments-us-east-2-5a3f0bfa-664a",
+        "artifactDirectoryName": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z"
+      },
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      }
+    },
+    "appId": null,
+    "orgId": null,
+    "layers": {}
+  },
+  "package": {
+    "individually": true,
+    "artifactDirectoryName": "serverless/crud-serverless-ticket/dev/1765563420011-2025-12-12T18:17:00.011Z",
+    "artifact": ""
+  }
+}
